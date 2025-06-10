@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ✅ Styled and properly placed Logout Button -->
+  <button id="logout-btn" class="logout-button">Logout</button>
+
+  <div class="background-wrapper">
+    <div class="app-container">
+      <h1>Expense Tracker</h1>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="add-expense">Add Expense</button>
+        <button class="tab-btn" data-tab="history">History</button>
+      </div>
+
+      <div id="add-expense" class="tab-content active">
+        <div class="form">
+          <input type="text" id="expense-name" placeholder="Expense name" />
+          <input type="number" id="expense-amount" placeholder="Amount" min="0" />
+          <button id="add-btn">Add Expense</button>
+        </div>
+      </div>
+
+      <div id="history" class="tab-content">
+        <ul id="expense-list"></ul>
+      </div>
+
+      <h2>Total: ₹<span id="total">0</span></h2>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

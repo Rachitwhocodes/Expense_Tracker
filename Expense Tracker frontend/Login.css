@@ -1,0 +1,165 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  body {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .container {
+    background-color: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 320px;
+    animation: fadeIn 0.6s ease;
+  }
+  
+  .form-box h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+  }
+  
+  input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    transition: border-color 0.3s;
+  }
+  
+  input:focus {
+    border-color: #2575fc;
+    outline: none;
+  }
+  
+  button {
+    width: 100%;
+    background-color: #2575fc;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #1e5dd0;
+  }
+  
+  .toggle-text {
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: center;
+    color: #444;
+  }
+  
+  .toggle-text span {
+    color: #2575fc;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+ /* ===== IMPROVED PASSWORD STRENGTH METER ===== */
+#password-strength-container {
+    margin: 15px 0 10px;
+  }
+  
+  #password-strength-meter {
+    height: 8px;
+    width: 100%;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  
+  #password-strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  #password-requirements {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    margin-top: 12px;
+  }
+  
+  #password-requirements p {
+    width: 100%;
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #555;
+  }
+  
+  #password-requirements ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    width: 100%;
+  }
+  
+  #password-requirements li {
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+  }
+  
+  #password-requirements li:before {
+    content: "✖";
+    color: #ff4444;
+    margin-right: 6px;
+    font-size: 14px;
+  }
+  
+  #password-requirements li.valid:before {
+    content: "✔";
+    color: #00C851;
+  }
+  /* Password input container */
+.password-input-container {
+    position: relative;
+    margin-bottom: 15px;
+  }
+  
+  /* Eye icon styling */
+  .toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 40%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .toggle-password:hover {
+    color: #2575fc;
+  }
+  
+  /* Adjust input padding */
+  #password {
+    padding-right: 40px !important;
+    width: 100%;
+  }
