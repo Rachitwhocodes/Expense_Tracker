@@ -28,6 +28,17 @@ app.use((req, res, next) => {
     }
     next();
   });
+  // Add this near your other routes (before error handling)
+  app.get('/', (req, res) => {
+    res.status(200).json({
+      status: 'API is running',
+      message: 'Welcome to Expense Tracker Backend!',
+      endpoints: {
+        auth: ['POST /register', 'POST /login'],
+        expenses: ['GET /expenses/:userId', 'POST /expenses']
+      }
+    });
+  });
 // User Schema
 const User = mongoose.model('User', {
   username: String,
