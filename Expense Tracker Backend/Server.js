@@ -13,7 +13,7 @@ const corsOptions = {
   };
   
   app.use(cors(corsOptions));
-  
+
 // Connect to MongoDB Atlas
 mongoose.connect('mongodb+srv://Expense_Tracker:Rachit2003@cluster0.l1u25qt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
   .then(() => console.log('Connected to MongoDB'))
@@ -90,4 +90,9 @@ app.get('/expenses/:userId', async (req, res) => {
     }
   });
   require('dotenv').config();
-mongoose.connect(process.env.MONGODB_URI);
+  const PORT = process.env.PORT || 5000;
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+  
