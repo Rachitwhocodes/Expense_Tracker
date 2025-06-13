@@ -189,3 +189,21 @@ h2 {
   margin-bottom: 10px;
   padding: 12px 8px !important;
 }
+/* Add to existing styles */
+.user-info {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 1000;
+}
+
+#username-display {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

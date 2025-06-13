@@ -15,9 +15,9 @@ toggleLink.addEventListener('click', () => {
     : 'Already have an account? ';
 });
 
-// ✅ Password strength checker (only runs on registration)
+// Password strength checker
 document.getElementById('password').addEventListener('input', function () {
-  if (isLogin) return; // Don't show strength check during login
+  if (isLogin) return;
 
   const password = this.value;
   const meter = document.getElementById('password-strength-bar');
@@ -44,7 +44,7 @@ document.getElementById('password').addEventListener('input', function () {
   }
 });
 
-// 👁️ Password visibility toggle
+// Password visibility toggle
 document.getElementById('toggle-password').addEventListener('click', function () {
   const passwordInput = document.getElementById('password');
   const icon = this;
@@ -60,14 +60,14 @@ document.getElementById('toggle-password').addEventListener('click', function ()
   }
 });
 
-// 🚀 Unified Form Submit Handler
+// Unified Form Submit Handler
 document.getElementById('auth-form').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
 
-  // 🛡️ Validate password only during registration
+  // Validate password only during registration
   if (!isLogin) {
     const strongRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     if (!strongRegex.test(password)) {
@@ -88,22 +88,28 @@ document.getElementById('auth-form').addEventListener('submit', async (e) => {
     const data = await response.json();
 
     if (data.success) {
-      // 🧹 Clear old user data if new user logs in
-      if (!localStorage.getItem('currentUser') || localStorage.getItem('currentUser') !== username) {
-        localStorage.removeItem('expenses');
+      if (isLogin) {
+        // Save token and user info for authenticated sessions
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('username', data.username);
+        
+        // Redirect to home
+        window.location.href = 'index.html';
+      } else {
+        // After registration, switch to login form
+        alert('Registration successful! Please login');
+        isLogin = true;
+        formTitle.textContent = 'Login';
+        submitBtn.textContent = 'Login';
+        toggleLink.textContent = 'Register';
+        document.querySelector('.toggle-text').childNodes[0].textContent = 'Don’t have an account? ';
       }
-
-      localStorage.setItem('userId', data.userId);
-      localStorage.setItem('loggedInUser', username);
-      localStorage.setItem('currentUser', username);
-
-      // ✅ Redirect to home
-      window.location.href = 'index.html';
     } else {
-      alert(isLogin ? 'Invalid credentials' : 'Registration failed');
+      alert(data.error || (isLogin ? 'Invalid credentials' : 'Registration failed'));
     }
   } catch (error) {
+    console.error('Auth error:', error);
     alert('Connection error. Please try again later.');
-    console.error(error);
   }
 });

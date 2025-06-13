@@ -1,6 +1,6 @@
 // Redirect if user not logged in
-const user = localStorage.getItem("loggedInUser");
-if (!user) {
+const token = localStorage.getItem("token");
+if (!token) {
   window.location.href = "login.html";
 }
 
@@ -24,7 +24,7 @@ function formatDate(dateStr) {
 
 // Calculate ALL-TIME total
 function calculateTotal() {
-  return expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+  return expenses.reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
 }
 
 // Calculate monthly total
@@ -38,7 +38,7 @@ function calculateMonthlyTotal() {
       const d = new Date(exp.date);
       return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
     })
-    .reduce((sum, exp) => sum + Number(exp.amount), 0);
+    .reduce((sum, exp) => sum + parseFloat(exp.amount), 0);
 }
 
 // Render expenses in history tab
@@ -58,6 +58,7 @@ function renderExpenses() {
   `;
   monthlyTotalHeader.style.background = '#f0f0f0';
   monthlyTotalHeader.style.fontWeight = 'bold';
+  monthlyTotalHeader.style.padding = '12px 8px';
   expenseList.appendChild(monthlyTotalHeader);
 
   // Add individual expenses
@@ -67,7 +68,7 @@ function renderExpenses() {
       const li = document.createElement('li');
       li.innerHTML = `
         <span>${exp.name} <small style="color:#666;">(${formatDate(exp.date)})</small></span>
-        <span class="amount">₹${Number(exp.amount).toFixed(2)}</span>
+        <span class="amount">₹${parseFloat(exp.amount).toFixed(2)}</span>
       `;
       expenseList.appendChild(li);
     });
@@ -82,20 +83,33 @@ function updateUI() {
 // Load expenses from database
 async function loadExpenses() {
   try {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
+    const token = localStorage.getItem('token');
+    if (!token) {
       window.location.href = 'login.html';
       return;
     }
     
-    const response = await fetch(`http://localhost:3001/expenses/${userId}`);
-    if (!response.ok) throw new Error('Failed to load expenses');
+    const response = await fetch(`http://localhost:3001/expenses`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to load expenses: ${response.status}`);
+    }
     
     expenses = await response.json();
+    
+    // Ensure amounts are numbers
+    expenses.forEach(exp => {
+      exp.amount = parseFloat(exp.amount);
+    });
+    
     updateUI();
   } catch (error) {
     console.error('Error loading expenses:', error);
-    alert('Failed to load expenses. Please try again.');
+    alert(`Failed to load expenses: ${error.message}`);
   }
 }
 
@@ -103,6 +117,13 @@ async function loadExpenses() {
 async function addExpense() {
   const name = expenseNameInput.value.trim();
   const amount = expenseAmountInput.value.trim();
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    alert('Session expired. Please login again.');
+    window.location.href = 'login.html';
+    return;
+  }
 
   if (!name || !amount || isNaN(amount) || amount <= 0) {
     alert('Please enter a valid expense name and amount.');
@@ -110,30 +131,34 @@ async function addExpense() {
   }
 
   try {
-    const newExpense = {
-      userId: localStorage.getItem('userId'),
-      name,
-      amount: Number(amount),
-      date: new Date().toISOString()
-    };
-
+    const amountNum = parseFloat(amount);
+    
     const response = await fetch('http://localhost:3001/expenses', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newExpense)
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, amount: amountNum })
     });
 
-    if (!response.ok) throw new Error('Failed to save expense');
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to save expense');
+    }
 
-    expenses.push(newExpense);
+    const savedExpense = await response.json();
+    savedExpense.amount = parseFloat(savedExpense.amount);
+    expenses.push(savedExpense);
     updateUI();
     
     // Clear inputs
     expenseNameInput.value = '';
     expenseAmountInput.value = '';
+    expenseNameInput.focus();
   } catch (error) {
     console.error('Error adding expense:', error);
-    alert('Failed to add expense. Please try again.');
+    alert(`Failed to add expense: ${error.message}`);
   }
 }
 
@@ -150,18 +175,40 @@ tabs.forEach(tab => {
 
 // Logout functionality
 logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('loggedInUser');
+  localStorage.removeItem('token');
   localStorage.removeItem('userId');
+  localStorage.removeItem('username');
   window.location.href = 'login.html';
 });
 
+// Auto-logout when token expires
+function checkTokenExpiration() {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp * 1000 < Date.now()) {
+      alert('Your session has expired. Please login again.');
+      logoutBtn.click();
+    }
+  } catch (e) {
+    console.error('Token check error:', e);
+  }
+}
+
 // Add event listeners
 addBtn.addEventListener('click', addExpense);
-[expenseNameInput, expenseAmountInput].forEach(input =>
+
+// Handle Enter key in input fields
+[expenseNameInput, expenseAmountInput].forEach(input => {
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter') addExpense();
-  })
-);
+  });
+});
 
 // Initialize
 loadExpenses();
+
+// Check token expiration every minute
+setInterval(checkTokenExpiration, 60000);
